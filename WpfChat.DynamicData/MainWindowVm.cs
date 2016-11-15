@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using DynamicData;
-using DynamicData.Binding;
 using PropertyChanged;
 using WpfChat.DynamicData.Enums;
 using WpfChat.DynamicData.Interfaces;
@@ -16,23 +13,33 @@ namespace WpfChat.DynamicData
     [ImplementPropertyChanged]
     public class MainWindowVm
     {
-        private static MainWindowVm _instance;
-        public static MainWindowVm Instance => _instance ?? (_instance = new MainWindowVm());
+        #region GUI Vars
 
-        private ISourceList<IAnimalVm> SourceList { get; } = new SourceList<IAnimalVm>();
-        readonly ReadOnlyObservableCollection<IAnimalVm> _animals;
         public ReadOnlyObservableCollection<IAnimalVm> Animals => _animals;
-
         public ObservableCollection<EnumSelectorVm> AnimalClasses { get; } = new ObservableCollection<EnumSelectorVm>();
 
-        private readonly AnimalFilterer _animalFilterer = new AnimalFilterer();
-        private readonly AnimalSorter _animalSorter = new AnimalSorter();
+        #endregion
 
-        public bool SortByName { get; set; } = true;
-        public bool SortByClass { get; set; }
+        #region ICommands
 
         private RelayCommand _cmdSort;
         public ICommand CmdSort => _cmdSort ?? (_cmdSort = new RelayCommand(Sort));
+
+        #endregion
+
+        #region Private Vars
+
+        private readonly ReadOnlyObservableCollection<IAnimalVm> _animals;
+        private ISourceList<IAnimalVm> SourceList { get; } = new SourceList<IAnimalVm>();
+        private readonly AnimalFilterer _animalFilterer = new AnimalFilterer();
+        private readonly AnimalSorter _animalSorter = new AnimalSorter();
+
+        #endregion
+
+        #region C'Tor
+
+        private static MainWindowVm _instance;
+        public static MainWindowVm Instance => _instance ?? (_instance = new MainWindowVm());
 
         private MainWindowVm()
         {
@@ -53,25 +60,9 @@ namespace WpfChat.DynamicData
                                         .Subscribe();
         }
 
-        private void PopulateAnimalClasses()
-        {
-            foreach (AnimalClass animalClass in Enum.GetValues(typeof(AnimalClass)))
-            {
-                AnimalClasses.Add(new EnumSelectorVm(animalClass));
-            }
-        }
+        #endregion
 
-        private void OnSortByNameChanged()
-        {
-            if (SortByName)
-                SortByClass = false;
-        }
-
-        private void OnSortByClassChanged()
-        {
-            if (SortByClass)
-                SortByName = false;
-        }
+        #region GUI Methods
 
         private void Sort(object o)
         {
@@ -86,26 +77,19 @@ namespace WpfChat.DynamicData
                     break;
             }
         }
-    }
 
-    public class AnimalSorter : IComparer<IAnimalVm>
-    {
-        public int Compare(IAnimalVm x, IAnimalVm y)
+        #endregion
+
+        #region Private Methods
+
+        private void PopulateAnimalClasses()
         {
-            return string.Compare(x.Name, y.Name, StringComparison.Ordinal);
+            foreach (AnimalClass animalClass in Enum.GetValues(typeof(AnimalClass)))
+            {
+                AnimalClasses.Add(new EnumSelectorVm(animalClass));
+            }
         }
-    }
 
-    public class AnimalFilterer
-    {
-        public bool Filter(IAnimalVm animalVm)
-        {
-            var selectedAnimalClasses = MainWindowVm.Instance.AnimalClasses.Where(x => x.IsSelected).Select(x => (AnimalClass)Enum.Parse(typeof(AnimalClass), x.Header)).ToList();
-
-            if (selectedAnimalClasses.Any())
-                return selectedAnimalClasses.Contains(animalVm.AnimalClass);
-
-            return true;
-        }
+        #endregion
     }
 }

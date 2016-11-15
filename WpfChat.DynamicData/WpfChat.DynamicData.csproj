@@ -85,6 +85,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnimalFilterer.cs" />
+    <Compile Include="AnimalSorter.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="ViewModels\EnumSelectorVm.cs" />
     <Page Include="MainWindow.xaml">

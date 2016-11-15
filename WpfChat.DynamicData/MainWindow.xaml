@@ -1,0 +1,89 @@
+﻿<Window x:Class="WpfChat.DynamicData.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:interfaces="clr-namespace:WpfChat.DynamicData.Interfaces"
+        xmlns:dynamicData="clr-namespace:WpfChat.DynamicData"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525" d:DataContext="{d:DesignInstance dynamicData:MainWindowVm}">
+    
+    <Window.Resources>
+        <DataTemplate x:Key="AnimalTemplate" DataType="interfaces:IAnimalVm">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="A" />
+                    <ColumnDefinition SharedSizeGroup="B" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+                <TextBlock Grid.Column="1" Text="{Binding AnimalClass}" />
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        
+        <Grid Grid.Column="0">
+            <HeaderedItemsControl ItemsSource="{Binding Animals}" ItemTemplate="{StaticResource AnimalTemplate}">
+                <HeaderedItemsControl.Template>
+                    <ControlTemplate TargetType="{x:Type HeaderedItemsControl}">
+                        <Border>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <ContentPresenter ContentSource="Header" />
+                                <Separator Grid.Row="1" />
+                                <ItemsPresenter Grid.Row="2" />
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </HeaderedItemsControl.Template>
+                <HeaderedItemsControl.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="A" />
+                            <ColumnDefinition SharedSizeGroup="B" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0">
+                            <Hyperlink Command="{Binding CmdSort}" CommandParameter="Name">Name</Hyperlink>
+                        </TextBlock>
+                        <TextBlock Grid.Column="1">
+                            <Hyperlink Command="{Binding CmdSort}" CommandParameter="Class">Class</Hyperlink>
+                        </TextBlock>
+                    </Grid>
+                </HeaderedItemsControl.Header>
+            </HeaderedItemsControl>
+        </Grid>
+
+        <Grid Grid.Column="1">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Filter Classes" />
+                <Separator />
+                <ListView ItemsSource="{Binding AnimalClasses}" SelectionMode="Extended" BorderThickness="0">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Header}" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </StackPanel>
+
+        </Grid>
+
+    </Grid>
+        
+</Window>
